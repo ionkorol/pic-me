@@ -1,106 +1,99 @@
-import React from "react";
-import { View, Image, StyleSheet, Text } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  Switch,
+  TextInputProps,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import Layout from "../components/common/Layout";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { connect } from "react-redux";
 import { RootState } from "../redux/store";
 import { UserProp } from "../utils/interfaces";
-import { Button } from "../components/ui";
+import { Button, Input, SexSelect } from "../components/ui";
 import * as userActions from "../redux/actions/userActions";
-import { Avatar } from "../components/account";
 import { colors } from "../styles/variables";
+import { Header } from "../components/common";
+import { classes } from "../styles";
+import { getAvatarUrl } from "../lib";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 interface Props {
   data: UserProp;
   userLogOut: () => void;
+  userSave: typeof userActions.save;
 }
 
 const Account: React.FC<Props> = (props) => {
-  const { data, userLogOut } = props;
+  const { data, userLogOut, userSave } = props;
 
-  const nav = useNavigation();
+  const [name, setName] = useState(data.name);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [sex, setSex] = useState<"male" | "female">(data.sex);
+
   return (
     <Layout>
-      <View style={styles.iconContainer}>
-        <Ionicons
-          onPress={() => nav.navigate("Home")}
-          name="grid"
-          size={30}
-          color="white"
+      <Header />
+      <View
+        style={{
+          alignItems: "center",
+          backgroundColor: colors.gray,
+          paddingVertical: 10,
+        }}
+      >
+        <Text style={{ ...classes.h1, color: colors.primary }}>My Profile</Text>
+      </View>
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flex: 1,
+          paddingHorizontal: 50,
+          justifyContent: "center",
+          marginTop: 20,
+        }}
+        extraScrollHeight={20}
+        keyboardOpeningTime={0}
+      >
+        <Input value={name} onChangeText={setName} placeholder="NAME" />
+        <SexSelect value={sex} setValue={setSex} />
+        <Input
+          value={oldPassword}
+          onChangeText={setOldPassword}
+          placeholder="CURRENT PASSWORD"
+          secureTextEntry
         />
-        <Ionicons name="share-social" size={30} color="white" />
-      </View>
-      <View style={styles.profileContainer}>
-        <Avatar size={100} />
-        <Text style={styles.name}>{data && data.name}</Text>
-      </View>
-      <View style={{ flex: 1, padding: 15, justifyContent: "flex-end" }}>
-        <Button onPress={userLogOut}>Log Out</Button>
-      </View>
+        <Input
+          value={newPassword}
+          onChangeText={setNewPassword}
+          placeholder="NEW PASSWORD"
+          secureTextEntry
+        />
+        <Button color={colors.success} onPress={() => userSave(name, sex)}>
+          Save
+        </Button>
+        <Button color={colors.error} onPress={userLogOut}>
+          Log Out
+        </Button>
+      </KeyboardAwareScrollView>
     </Layout>
   );
 };
 
 const mapState = (state: RootState) => ({
-  data: state.user.data,
+  data: state.user.data!,
 });
 
 const mapDispatch = {
   userLogOut: userActions.logOut,
+  userSave: userActions.save as any,
 };
 
 export default connect(mapState, mapDispatch)(Account);
 
-const styles = StyleSheet.create({
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 15,
-  },
-  profileContainer: {
-    backgroundColor: colors.secondary,
-    paddingVertical: 15,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-  },
-  catsContainer: {
-    flex: 1,
-    flexDirection: "column",
-    paddingVertical: 20,
-  },
-  name: {
-    fontSize: 30,
-    color: "#fff",
-    fontWeight: "bold",
-  },
-
-  cat: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: 50,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  catName: {
-    fontSize: 20,
-    color: "#fff",
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  catScoreContainer: {
-    backgroundColor: "#fff",
-    marginLeft: 10,
-    padding: 5,
-    borderRadius: 10,
-  },
-  catScore: {
-    fontSize: 20,
-    color: "green",
-    fontWeight: "bold",
-  },
-});
+const styles = StyleSheet.create({});

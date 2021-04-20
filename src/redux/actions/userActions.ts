@@ -1,6 +1,11 @@
 import firebase from "../../utils/firebase";
-import { AppDispatch } from "../store";
-import { USER_GET_REQUEST, USER_GET_SUCCESS, USER_GET_FAILURE } from "./types";
+import { AppDispatch, RootState } from "../store";
+import {
+  USER_GET_REQUEST,
+  USER_GET_SUCCESS,
+  USER_GET_FAILURE,
+  USER_ERROR_CLEAR,
+} from "./types";
 
 export const logIn = (email: string, password: string) => async (
   dispatch: AppDispatch
@@ -23,7 +28,8 @@ export const logIn = (email: string, password: string) => async (
 export const register = (
   email: string,
   password: string,
-  name: string
+  name: string,
+  sex: "male" | "female"
 ) => async (dispatch: AppDispatch) => {
   try {
     const user = (
@@ -31,9 +37,12 @@ export const register = (
     ).user;
     if (user) {
       const userObject = {
+        id: user.uid,
         email,
         name,
-        id: user.uid,
+        sex,
+        totalPoints: 0,
+        categories: {},
       };
       await firebase
         .firestore()
@@ -51,4 +60,24 @@ export const register = (
 
 export const logOut = () => async (dispatch: AppDispatch) => {
   firebase.auth().signOut();
+};
+
+export const save = (
+  name: string,
+  sex: "male" | "female",
+  password?: string
+) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const user = getState().user.data!;
+  try {
+    await firebase.firestore().collection("users").doc(user.id).update({
+      name,
+      sex,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const errorClear = () => (dispatch: AppDispatch) => {
+  dispatch({ type: USER_ERROR_CLEAR, payload: null });
 };

@@ -1,23 +1,17 @@
 import React from "react";
-import { TextInput, StyleSheet } from "react-native";
+import { TextInput, StyleSheet, TextInputProps } from "react-native";
 import { colors } from "../../styles/variables";
 
-interface Props {
-  value: string;
-  onChangeText: any;
-  placeholder: string;
-}
+interface Props extends TextInputProps {}
 
 const Input: React.FC<Props> = (props) => {
-  const { value, onChangeText, placeholder } = props;
-
   return (
     <TextInput
+      {...props}
       style={styles.container}
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
       placeholderTextColor={colors.gray}
+      keyboardAppearance="dark"
+      maxFontSizeMultiplier={0.1}
     />
   );
 };

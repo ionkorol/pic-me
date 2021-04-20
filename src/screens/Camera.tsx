@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import * as FileSystem from "expo-file-system";
+import React, { useState, useEffect, useRef } from "react";
+
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Camera } from "expo-camera";
 import Layout from "../components/common/Layout";
@@ -8,107 +8,56 @@ import { useNavigation } from "@react-navigation/core";
 import { RootState } from "../redux/store";
 import { Ionicons } from "@expo/vector-icons";
 import { Button } from "../components/ui";
-import firebase from "firebase";
+
 import { UserProp, CategoryProp } from "../utils/interfaces";
 import { colors } from "../styles/variables";
-import * as Location from "expo-location";
+
 import { LoadingScreen } from "../components/common";
-import { Result } from "../components/camera";
 import { locationCheck } from "../lib";
 
+import * as pictureActions from "../redux/actions/pictureActions";
+
 interface Props {
-  currentCategory: string;
-  data: UserProp;
+  category: string;
+  userData: UserProp;
+  image: string | null;
+  pictureSet: typeof pictureActions.set;
+  pictureGetLabels: typeof pictureActions.getLabels;
+  labelsData: string[] | null;
 }
 
 const CameraScreen: React.FC<Props> = (props) => {
-  const { currentCategory, data } = props;
+  const { category, userData, pictureSet } = props;
 
   const [locationError, setLocationError] = useState<boolean | null>(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
-  const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const [ciLabels, setCILabels] = useState<string[]>([]);
-  const [ciLoading, setCILoading] = useState(false);
+  const nav = useNavigation();
 
   const cameraRef = useRef<Camera>(null);
 
-  const nav = useNavigation();
-
-  const [found, setFound] = useState<boolean | null>(null);
-
-  const addPoint = async () => {
-    const { longitude, latitude } = (
-      await Location.getCurrentPositionAsync()
-    ).coords;
-
-    const userRef = firebase.firestore().collection("users").doc(data.id);
-
-    userRef.update({
-      totalPoints: firebase.firestore.FieldValue.increment(1),
-      [`categories.${currentCategory.toLowerCase()}.points`]: firebase.firestore.FieldValue.increment(
-        1
-      ),
-      [`categories.${currentCategory.toLowerCase()}.location`]: new firebase.firestore.GeoPoint(
-        latitude,
-        longitude
-      ),
-    });
-  };
-
+  // Check for location error
   useEffect(() => {
     (async () => {
       setLocationError(
         await locationCheck(
-          data.categories[currentCategory.toLowerCase()] as CategoryProp
+          userData.categories[category.toLowerCase()] as CategoryProp
         )
       );
     })();
-  }, []);
+  }, [category]);
 
-  useEffect(() => {
-    if (found) {
-      addPoint();
-    }
-  }, [found]);
-
-  const analPic = async (image: string) => {
-    setCILabels([]);
-    setCILoading(true);
-    const base64 = await FileSystem.readAsStringAsync(image, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-
-    const res = await fetch("http://10.0.0.101:8080/", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: base64,
-      }),
-    });
-    const data = await res.json();
-    setCILabels(data);
-    setCILoading(false);
-  };
-
+  // Handle take picture button
   const takePick = async () => {
     if (cameraRef.current) {
       const camera = cameraRef.current;
 
       await camera.takePictureAsync({
         onPictureSaved: (picture) => {
-          setCurrentImage(picture.uri);
-          analPic(picture.uri);
+          pictureSet(picture.uri);
+          nav.navigate("Result");
         },
       });
     }
   };
-
-  useEffect(() => {
-    setFound(ciLabels.includes(currentCategory));
-  }, [ciLabels]);
 
   if (locationError === null) {
     return <LoadingScreen />;
@@ -117,11 +66,20 @@ const CameraScreen: React.FC<Props> = (props) => {
   if (locationError) {
     return (
       <Layout>
-        <View style={{ padding: 50 }}>
+        <View
+          style={{
+            backgroundColor: colors.gray,
+            alignSelf: "center",
+            padding: 20,
+            borderRadius: 10,
+            alignItems: "center",
+          }}
+        >
+          <Ionicons name="compass" size={100} color={colors.error} />
           <Text
             style={{
               textAlign: "center",
-              color: "red",
+              color: "#E05C63",
               fontSize: 30,
               fontWeight: "bold",
             }}
@@ -134,20 +92,13 @@ const CameraScreen: React.FC<Props> = (props) => {
     );
   }
 
-  if (currentImage) {
-    return (
-      <Result
-        ciLoading={ciLoading}
-        found={found}
-        currentImage={currentImage}
-        currentCategory={currentCategory}
-        setCurrentImage={setCurrentImage}
-      />
-    );
-  }
   return (
     <Layout>
-      <Camera ref={cameraRef} style={styles.camera} type={type}>
+      <Camera
+        ref={cameraRef}
+        style={styles.camera}
+        type={Camera.Constants.Type.back}
+      >
         <TouchableOpacity style={styles.cameraButton} onPress={takePick}>
           <Ionicons name="camera" size={30} color="#000" />
         </TouchableOpacity>
@@ -163,13 +114,18 @@ const CameraScreen: React.FC<Props> = (props) => {
 };
 
 const mapState = (state: RootState) => ({
-  loading: state.user.loading,
-  data: state.user.data,
-  error: state.user.error,
-  currentCategory: state.game.currentCategory,
+  userData: state.user.data!,
+  category: state.game.category!,
+  image: state.picture.image,
+  labelsData: state.picture.labelsData,
 });
 
-export default connect(mapState)(CameraScreen);
+const mapDispatch = {
+  pictureSet: pictureActions.set as any,
+  pictureGetLabels: pictureActions.getLabels as any,
+};
+
+export default connect(mapState, mapDispatch)(CameraScreen);
 
 const styles = StyleSheet.create({
   camera: {

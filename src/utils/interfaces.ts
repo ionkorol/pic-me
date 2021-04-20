@@ -3,6 +3,7 @@ export interface UserProp {
   name: string;
   email: string;
   totalPoints: number;
+  sex: "male" | "female";
   categories: {
     [key: string]: {
       points: number;

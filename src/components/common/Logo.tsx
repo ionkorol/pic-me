@@ -22,10 +22,12 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: "bold",
     color: colors.gray,
+    letterSpacing: 5,
   },
   second: {
     fontSize: 50,
     fontWeight: "bold",
     color: colors.secondary,
+    letterSpacing: 5,
   },
 });

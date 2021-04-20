@@ -1,0 +1,5 @@
+# TODO
+
+## Functions
+
+- [ ] Favorite categories

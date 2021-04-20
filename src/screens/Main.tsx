@@ -12,6 +12,7 @@ import { CategoryProp, UserProp } from "../utils/interfaces";
 import { colors } from "../styles/variables";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { Avatar } from "../components/account";
+import { Header } from "../components/common";
 
 interface Props {
   categoriesGet: () => any;
@@ -56,36 +57,7 @@ const Main: React.FC<Props> = (props) => {
 
   return (
     <Layout>
-      <View style={styles.header}>
-        <Pressable
-          style={styles.profileContainer}
-          onPress={() => nav.navigate("Account")}
-        >
-          <Avatar />
-          <View style={styles.profileInfo}>
-            <Text style={styles.headline}>{userData.name}</Text>
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons name="star" size={20} color="#fff" />
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  color: "#fff",
-                  marginLeft: 5,
-                }}
-              >
-                {userData.totalPoints}
-              </Text>
-            </View>
-          </View>
-        </Pressable>
-        <MaterialIcons
-          onPress={() => nav.navigate("LeaderBoard")}
-          name="leaderboard"
-          size={30}
-          color="#fff"
-        />
-      </View>
+      <Header />
       <View style={styles.filters}>
         <TouchableOpacity
           onPress={() => setActiveFilter("grid")}
@@ -129,7 +101,7 @@ const Main: React.FC<Props> = (props) => {
 
 const mapState = (state: RootState) => ({
   userLoading: state.user.loading,
-  userData: state.user.data,
+  userData: state.user.data!,
   userError: state.user.error,
   categoriesLoading: state.categories.loading,
   categoriesData: state.categories.data,
@@ -143,19 +115,6 @@ const mapDispatch = {
 export default connect(mapState, mapDispatch)(Main);
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: colors.secondary,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 15,
-  },
-  profileContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  profileInfo: {},
-
   filters: {
     height: 60,
     flexDirection: "row",

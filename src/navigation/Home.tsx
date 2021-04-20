@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import MainScreen from "../screens/Main";
 import AccountScreen from "../screens/Account";
 import CameraScreen from "../screens/Camera";
+import ResultScreen from "../screens/Result";
 import LeaderBoardScreen from "../screens/LeaderBoard";
 import { UserProp } from "../utils/interfaces";
 import { RootState } from "../redux/store";
@@ -24,13 +25,14 @@ const HomeNavigation: React.FC<Props> = (props) => {
       <Stack.Screen name="Home" component={MainScreen} />
       <Stack.Screen name="Account" component={AccountScreen} />
       <Stack.Screen name="Camera" component={CameraScreen} />
+      <Stack.Screen name="Result" component={ResultScreen} />
       <Stack.Screen name="LeaderBoard" component={LeaderBoardScreen} />
     </Stack.Navigator>
   );
 };
 
 const mapState = (state: RootState) => ({
-  userData: state.user.data,
+  userData: state.user.data!,
   userLoading: state.user.loading,
 });
 

@@ -5,13 +5,18 @@ import { colors } from "../../styles/variables";
 interface Props {
   color?: string;
   onPress?: () => any;
+  disabled?: boolean;
 }
 const Button: React.FC<Props> = (props) => {
-  const { color, onPress } = props;
+  const { color, onPress, disabled } = props;
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
-      style={{ ...styles.container, backgroundColor: color ? color : colors.secondary }}
+      style={{
+        ...styles.container,
+        backgroundColor: color ? color : colors.secondary,
+      }}
     >
       <Text style={{ ...styles.text }}>{props.children}</Text>
     </TouchableOpacity>

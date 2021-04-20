@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/core";
 import React, { useEffect, useState } from "react";
 import { View, Pressable, StyleSheet, Image, Text } from "react-native";
-import { Layout } from "../components/common";
+import { Header, Layout } from "../components/common";
 import { colors } from "../styles/variables";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { RootState } from "../redux/store";
@@ -10,14 +10,11 @@ import { UserProp } from "../utils/interfaces";
 import { FlatList } from "react-native-gesture-handler";
 import firebase from "../utils/firebase";
 import { Avatar } from "../components/account";
+import { classes } from "../styles";
 
-interface Props {
-  userData: UserProp;
-}
+interface Props {}
 
 const LeaderBoard: React.FC<Props> = (props) => {
-  const { userData } = props;
-  const nav = useNavigation();
   const [users, setUsers] = useState<UserProp[]>([]);
 
   useEffect(() => {
@@ -34,35 +31,22 @@ const LeaderBoard: React.FC<Props> = (props) => {
 
   return (
     <Layout>
-      <View style={styles.header}>
-        <Pressable
-          style={styles.profileContainer}
-          onPress={() => nav.navigate("Account")}
-        >
-          <Avatar />
-          <Text style={styles.headline}>{userData.name}</Text>
-        </Pressable>
-        <MaterialIcons
-          onPress={() => nav.navigate("Home")}
-          name="home"
-          size={30}
-          color="#fff"
-        />
-      </View>
-      <View>
-        <Text style={styles.headline}>LeaderBoard</Text>
+      <Header />
+      <View style={{ padding: 10, alignItems: "center" }}>
+        <Text style={classes.h1}>Leader Board</Text>
       </View>
       <FlatList
         style={styles.board}
         data={users}
         renderItem={(item) => (
           <View style={styles.boardItem}>
-            <View>
+            <View style={{ flexDirection: "row" }}>
+              <Avatar sex={item.item.sex} size={30} />
               <Text style={styles.boardItemName}>{item.item.name}</Text>
             </View>
             <View style={{ flexDirection: "row" }}>
               <Ionicons name="star" size={20} color={colors.secondary} />
-              <Text style={styles.boardItemPoints}>
+              <Text style={{ ...styles.boardItemPoints, ...classes.ml }}>
                 {item.item.totalPoints}
               </Text>
             </View>
@@ -75,23 +59,12 @@ const LeaderBoard: React.FC<Props> = (props) => {
 };
 
 const mapState = (state: RootState) => ({
-  userData: state.user.data,
+  userData: state.user.data!,
 });
 
 export default connect(mapState)(LeaderBoard);
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: colors.secondary,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 15,
-  },
-  profileContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   board: {
     flex: 1,
     backgroundColor: colors.gray,
@@ -101,21 +74,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#fff",
     marginTop: 10,
+    marginHorizontal: 15,
     padding: 15,
+    borderRadius: 10,
   },
   boardItemName: {
     fontSize: 20,
     color: colors.primary,
+    fontWeight: "bold",
   },
   boardItemPoints: {
     fontSize: 20,
     color: colors.secondary,
-    fontWeight: "bold",
-  },
-  headline: {
-    fontSize: 30,
-    padding: 15,
-    color: "#fff",
     fontWeight: "bold",
   },
 });
