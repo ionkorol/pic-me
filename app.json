@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PicIt",
-    "slug": "PicIt",
+    "name": "PicYeah",
+    "slug": "pic-yeah",
     "version": "1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "is.digital.picme",
-      "buildNumber": "1.1"
+      "buildNumber": "1.1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses the location to prevent users from taking a picture in the same location multiple times.",
+        "NSCameraUsageDescription": "This app uses the camera to take pictures of objects in order for them to be recognized."
+      }
     },
     "android": {
       "package": "is.digital.picme",
