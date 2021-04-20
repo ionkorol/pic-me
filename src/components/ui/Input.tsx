@@ -11,7 +11,6 @@ const Input: React.FC<Props> = (props) => {
       style={styles.container}
       placeholderTextColor={colors.gray}
       keyboardAppearance="dark"
-      maxFontSizeMultiplier={0.1}
     />
   );
 };
