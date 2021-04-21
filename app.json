@@ -2,7 +2,7 @@
   "expo": {
     "name": "PicYeah",
     "slug": "pic-yeah",
-    "version": "1.1",
+    "version": "1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -16,15 +16,15 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "is.digital.picme",
-      "buildNumber": "1.1",
+      "bundleIdentifier": "is.digital.pic-yeah",
+      "buildNumber": "1",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses the location to prevent users from taking a picture in the same location multiple times.",
         "NSCameraUsageDescription": "This app uses the camera to take pictures of objects in order for them to be recognized."
       }
     },
     "android": {
-      "package": "is.digital.picme",
+      "package": "is.digital.pic-yeah",
       "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

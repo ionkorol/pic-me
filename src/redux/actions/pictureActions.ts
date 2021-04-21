@@ -19,6 +19,7 @@ export const getLabels = (image: string) => async (
     const base64 = await FileSystem.readAsStringAsync(image, {
       encoding: FileSystem.EncodingType.Base64,
     });
+    console.log(base64.slice(0, 20))
     const res = await fetch(
       "https://us-central1-picpic-310022.cloudfunctions.net/GetLabels",
       {

@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import MainNavigation from "./src/navigation/Main";
 
 import { Provider } from "react-redux";
@@ -12,20 +10,26 @@ import {
   USER_GET_REQUEST,
   USER_GET_SUCCESS,
 } from "./src/redux/actions/types";
-import { Camera } from "expo-camera";
-import * as Location from "expo-location";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
+import * as Permissions from "expo-permissions";
+import { Layout } from "./src/components/common";
+import { classes } from "./src/styles";
+import { colors } from "./src/styles/variables";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface Props {}
 
 const App: React.FC<Props> = (props) => {
+  const [
+    permissions,
+    askPermissions,
+    getPermissions,
+  ] = Permissions.usePermissions([Permissions.CAMERA, Permissions.LOCATION], {
+    ask: true,
+  });
   const [user, setUser] = useState<firebase.User | null>(null);
-  const [cameraPermissions, setCameraPermissions] = useState<boolean | null>(
-    null
-  );
-  const [locationPermissions, setLocationPermissions] = useState<
-    boolean | null
-  >(null);
+
+  console.log(permissions)
 
   useEffect(() => {
     const unsub = firebase.auth().onAuthStateChanged((user) => {
@@ -66,23 +70,30 @@ const App: React.FC<Props> = (props) => {
   }, [user]);
 
   // Requests Camera and Location Permisions
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setCameraPermissions(status === "granted");
-    })();
+  // useEffect(() => {
+  //   (async () => {
+  //     const { status } = await Camera.requestPermissionsAsync();
+  //     setCameraPermissions(status === "granted");
+  //   })();
 
-    (async () => {
-      let { status } = await Location.requestPermissionsAsync();
-      setLocationPermissions(status === "granted");
-    })();
-  }, []);
+  //   (async () => {
+  //     let { status } = await Location.requestPermissionsAsync();
+  //     setLocationPermissions(status === "granted");
+  //   })();
+  // }, []);
 
-  if (!locationPermissions || !cameraPermissions) {
+  if (!permissions || permissions.status !== "granted") {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ fontSize: 30 }}>Permissions not granted!</Text>
-      </View>
+      <Layout>
+        <View style={styles.pContainer}>
+          <View style={styles.pHead}>
+            <Text style={classes.h1}>Permissions</Text>
+          </View>
+          <View style={styles.pContent}>
+            <Text style={{ fontSize: 25 }}>Permissions not granted!</Text>
+          </View>
+        </View>
+      </Layout>
     );
   }
 
@@ -94,3 +105,22 @@ const App: React.FC<Props> = (props) => {
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  pContainer: {
+    width: "80%",
+    alignSelf: "center",
+  },
+  pHead: {
+    backgroundColor: colors.secondary,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  pContent: {
+    backgroundColor: colors.gray,
+    alignItems: "center",
+    paddingVertical: 50,
+  },
+});
