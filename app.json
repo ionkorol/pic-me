@@ -24,7 +24,7 @@
       }
     },
     "android": {
-      "package": "is.digital.pic-yeah",
+      "package": "is.digital.pic_yeah",
       "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

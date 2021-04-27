@@ -8,6 +8,7 @@ import {
 } from "./types";
 
 import * as FileSystem from "expo-file-system";
+import firebase from "../../utils/firebase";
 import { AppDispatch, RootState } from "../store";
 
 export const getLabels = (image: string) => async (
@@ -16,10 +17,15 @@ export const getLabels = (image: string) => async (
 ) => {
   dispatch({ type: PICTURE_GET_LABELS_REQUEST, payload: null });
   try {
+    // const imagePathArray = image.split("/");
+    // const imageName = imagePathArray[imagePathArray.length - 1];
+    // const imageRef = firebase.storage().ref(`images/test.jpg`);
     const base64 = await FileSystem.readAsStringAsync(image, {
       encoding: FileSystem.EncodingType.Base64,
     });
-    console.log(base64.slice(0, 20))
+
+    // const x = imageRef.putString(image, "data_url");
+    // console.log((await x).state);
     const res = await fetch(
       "https://us-central1-picpic-310022.cloudfunctions.net/GetLabels",
       {

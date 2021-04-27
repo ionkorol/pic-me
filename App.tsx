@@ -10,7 +10,7 @@ import {
   USER_GET_REQUEST,
   USER_GET_SUCCESS,
 } from "./src/redux/actions/types";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, Text, StyleSheet, Button, Linking } from "react-native";
 import * as Permissions from "expo-permissions";
 import { Layout } from "./src/components/common";
 import { classes } from "./src/styles";
@@ -28,8 +28,6 @@ const App: React.FC<Props> = (props) => {
     ask: true,
   });
   const [user, setUser] = useState<firebase.User | null>(null);
-
-  console.log(permissions)
 
   useEffect(() => {
     const unsub = firebase.auth().onAuthStateChanged((user) => {
@@ -69,6 +67,7 @@ const App: React.FC<Props> = (props) => {
     }
   }, [user]);
 
+
   // Requests Camera and Location Permisions
   // useEffect(() => {
   //   (async () => {
@@ -91,6 +90,9 @@ const App: React.FC<Props> = (props) => {
           </View>
           <View style={styles.pContent}>
             <Text style={{ fontSize: 25 }}>Permissions not granted!</Text>
+            <TouchableOpacity onPress={askPermissions}>
+              <Text>ASK</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Layout>

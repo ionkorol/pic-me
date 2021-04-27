@@ -24,7 +24,7 @@ const pictureReducer: Reducer<
   },
   { type: string; payload: any }
 > = (state = initialState, action) => {
-  console.log(action.type, action.payload)
+  console.log(action.type, action.payload);
   switch (action.type) {
     case PICTURE_SET:
       return {
