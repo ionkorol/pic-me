@@ -1,7 +1,7 @@
 import React, { Dispatch, useState } from "react";
 import { View, Image, StyleSheet, Pressable } from "react-native";
-import { getAvatarUrl } from "../../lib";
-import { colors } from "../../styles/variables";
+import { getAvatarUrl } from "lib";
+import { colors } from "style/variables";
 
 interface Props {
   value: "male" | "female";

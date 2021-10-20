@@ -6,20 +6,18 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { connect } from "react-redux";
-import { colors } from "../../styles/variables";
-import { RootState } from "../../redux/store";
-import { UserProp } from "../../utils/interfaces";
+import { colors } from "style/variables";
 import { useAssets } from "expo-asset";
+import { useAppSelector } from "store/store";
 
 interface Props {
   size?: number;
-  data: UserProp;
   sex?: "male" | "female";
 }
 
 const Avatar: React.FC<Props> = (props) => {
-  const { size, data, sex } = props;
+  const { size, sex } = props;
+  const { user } = useAppSelector((state) => state.user);
 
   const [image, setImage] = useState<ImageSourcePropType | null>(null);
 
@@ -49,13 +47,13 @@ const Avatar: React.FC<Props> = (props) => {
         setImage(require("../../assets/icons/avatar/male.png"));
       }
     } else {
-      if (data.sex === "female") {
+      if (user?.sex === "female") {
         setImage(require("../../assets/icons/avatar/female.png"));
       } else {
         setImage(require("../../assets/icons/avatar/male.png"));
       }
     }
-  }, [sex, data.sex]);
+  }, [sex, user?.sex]);
 
   if (!assets || !image) {
     return (
@@ -72,8 +70,4 @@ const Avatar: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  data: state.user.data!,
-});
-
-export default connect(mapState)(Avatar);
+export default Avatar;

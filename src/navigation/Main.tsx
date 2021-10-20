@@ -2,24 +2,19 @@ import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
 import HomeNavigation from "./Home";
 import AuthNavigation from "./Auth";
-import { RootState } from "../redux/store";
-import { connect } from "react-redux";
-import { UserProp } from "../utils/interfaces";
+import { useAppSelector } from "store/store";
+import { UserProp } from "utils/interfaces";
 
-interface Props {
-  data: UserProp;
-}
+interface Props {}
 
 const Main: React.FC<Props> = (props) => {
-  const { data } = props;
+  const { user, loading } = useAppSelector((state) => state.user);
+
   return (
     <NavigationContainer>
-      {data ? <HomeNavigation /> : <AuthNavigation />}
+      {user ? <HomeNavigation /> : <AuthNavigation />}
     </NavigationContainer>
   );
 };
 
-const mapState = (state: RootState) => ({
-  data: state.user.data,
-});
-export default connect(mapState)(Main);
+export default Main;

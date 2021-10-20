@@ -1,31 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image, Pressable } from "react-native";
-import Layout from "../components/common/Layout";
-import { connect } from "react-redux";
-import * as categoriesActions from "../redux/actions/categoriesActions";
-import { useNavigation } from "@react-navigation/core";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Card } from "../components/ui";
-import { RootState } from "../redux/store";
-import { CategoryProp, UserProp } from "../utils/interfaces";
+import React, { useEffect, useState, useCallback } from "react";
+import { StyleSheet, View, Image, Pressable } from "react-native";
+import Layout from "components/common/Layout";
+import { useFocusEffect, useNavigation } from "@react-navigation/core";
+import { Ionicons } from "@expo/vector-icons";
+import { Card } from "components/ui";
+import { useAppDispatch, useAppSelector } from "store/store";
+import { CategoryProp } from "utils/interfaces";
 
-import { colors } from "../styles/variables";
+import { colors } from "style/variables";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import { Avatar } from "../components/account";
-import { Header } from "../components/common";
+import { Header } from "components/common";
+import { getCategories } from "store/slices/categoriesSlice";
 
-interface Props {
-  categoriesGet: () => any;
-  userLoading: boolean;
-  userData: UserProp;
-  userError: any;
-  categoriesLoading: boolean;
-  categoriesData: CategoryProp[];
-  categoriesError: any;
-}
+interface Props {}
 
 const Main: React.FC<Props> = (props) => {
-  const { userData, categoriesData, categoriesGet } = props;
+  const userData = useAppSelector((state) => state.user.user!);
+  const categoriesData = useAppSelector((state) => state.categories.categories);
+  const dispatch = useAppDispatch();
+
   const [categories, setCategories] = useState<CategoryProp[]>([]);
   const [activeFilter, setActiveFilter] = useState<
     "grid" | "favorite" | "time"
@@ -51,9 +44,11 @@ const Main: React.FC<Props> = (props) => {
     setCategories(data.sort((a, b) => b.points! - a.points!));
   }, [userData, categoriesData]);
 
-  useEffect(() => {
-    categoriesGet();
-  }, [userData]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getCategories());
+    }, [userData])
+  );
 
   return (
     <Layout>
@@ -99,20 +94,7 @@ const Main: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  userLoading: state.user.loading,
-  userData: state.user.data!,
-  userError: state.user.error,
-  categoriesLoading: state.categories.loading,
-  categoriesData: state.categories.data,
-  categoriesError: state.categories.error,
-});
-
-const mapDispatch = {
-  categoriesGet: categoriesActions.categoriesGet,
-};
-
-export default connect(mapState, mapDispatch)(Main);
+export default Main;
 
 const styles = StyleSheet.create({
   filters: {

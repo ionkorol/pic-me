@@ -1,16 +1,14 @@
-import { useNavigation } from "@react-navigation/core";
 import React, { useEffect, useState } from "react";
-import { View, Pressable, StyleSheet, Image, Text } from "react-native";
-import { Header, Layout } from "../components/common";
-import { colors } from "../styles/variables";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { RootState } from "../redux/store";
-import { connect } from "react-redux";
-import { UserProp } from "../utils/interfaces";
+import { View, StyleSheet, Image, Text } from "react-native";
+import { Header, Layout } from "components/common";
+import { colors } from "style/variables";
+import { Ionicons } from "@expo/vector-icons";
+
+import { UserProp } from "utils/interfaces";
 import { FlatList } from "react-native-gesture-handler";
-import firebase from "../utils/firebase";
-import { Avatar } from "../components/account";
-import { classes } from "../styles";
+import firebase from "utils/firebase";
+import { Avatar } from "components/account";
+import { classes } from "style";
 
 interface Props {}
 
@@ -58,11 +56,7 @@ const LeaderBoard: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  userData: state.user.data!,
-});
-
-export default connect(mapState)(LeaderBoard);
+export default LeaderBoard;
 
 const styles = StyleSheet.create({
   board: {

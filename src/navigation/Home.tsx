@@ -1,28 +1,23 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-import MainScreen from "../screens/Main";
-import AccountScreen from "../screens/Account";
-import CameraScreen from "../screens/Camera";
-import ResultScreen from "../screens/Result";
-import LeaderBoardScreen from "../screens/LeaderBoard";
-import { UserProp } from "../utils/interfaces";
-import { RootState } from "../redux/store";
-import { connect } from "react-redux";
+import {
+  HomeScreen,
+  AccountScreen,
+  CameraScreen,
+  ResultScreen,
+  LeaderBoardScreen,
+} from "screens";
+
 import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
 
-interface Props {
-  userData: UserProp;
-  userLoading: boolean;
-}
+interface Props {}
 
 const HomeNavigation: React.FC<Props> = (props) => {
-  const { userData, userLoading } = props;
-
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={MainScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Account" component={AccountScreen} />
       <Stack.Screen name="Camera" component={CameraScreen} />
       <Stack.Screen name="Result" component={ResultScreen} />
@@ -31,9 +26,4 @@ const HomeNavigation: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  userData: state.user.data!,
-  userLoading: state.user.loading,
-});
-
-export default connect(mapState)(HomeNavigation);
+export default HomeNavigation;

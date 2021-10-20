@@ -2,33 +2,27 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Camera } from "expo-camera";
-import Layout from "../components/common/Layout";
-import { connect } from "react-redux";
+import Layout from "components/common/Layout";
 import { useNavigation } from "@react-navigation/core";
-import { RootState } from "../redux/store";
+import { useAppDispatch, useAppSelector } from "store/store";
 import { Ionicons } from "@expo/vector-icons";
-import { Button } from "../components/ui";
+import { Button } from "components/ui";
 
-import { UserProp, CategoryProp } from "../utils/interfaces";
-import { colors } from "../styles/variables";
+import { CategoryProp } from "utils/interfaces";
+import { colors } from "style/variables";
 
-import { LoadingScreen } from "../components/common";
-import { locationCheck } from "../lib";
+import { LoadingScreen } from "components/common";
+import { locationCheck } from "lib";
+import { setImage } from "store/slices/gameSlice";
 
-import * as pictureActions from "../redux/actions/pictureActions";
-
-interface Props {
-  category: string;
-  userData: UserProp;
-  image: string | null;
-  pictureSet: typeof pictureActions.set;
-  pictureGetLabels: typeof pictureActions.getLabels;
-  labelsData: string[] | null;
-}
+interface Props {}
 
 const CameraScreen: React.FC<Props> = (props) => {
-  const { category, userData, pictureSet } = props;
-
+  const userData = useAppSelector((state) => state.user.user!);
+  const { category } = useAppSelector((state) => state.categories);
+  const { labels } = useAppSelector((state) => state.labels);
+  const { image } = useAppSelector((state) => state.game);
+  const dispatch = useAppDispatch();
   const [locationError, setLocationError] = useState<boolean | null>(null);
   const nav = useNavigation();
 
@@ -39,7 +33,7 @@ const CameraScreen: React.FC<Props> = (props) => {
     (async () => {
       setLocationError(
         await locationCheck(
-          userData.categories[category.toLowerCase()] as CategoryProp
+          userData.categories[category!.toLowerCase()] as CategoryProp
         )
       );
     })();
@@ -52,7 +46,7 @@ const CameraScreen: React.FC<Props> = (props) => {
 
       await camera.takePictureAsync({
         onPictureSaved: (picture) => {
-          pictureSet(picture.uri);
+          dispatch(setImage(picture.uri));
           nav.navigate("Result");
         },
       });
@@ -113,19 +107,7 @@ const CameraScreen: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  userData: state.user.data!,
-  category: state.game.category!,
-  image: state.picture.image,
-  labelsData: state.picture.labelsData,
-});
-
-const mapDispatch = {
-  pictureSet: pictureActions.set as any,
-  pictureGetLabels: pictureActions.getLabels as any,
-};
-
-export default connect(mapState, mapDispatch)(CameraScreen);
+export default CameraScreen;
 
 const styles = StyleSheet.create({
   camera: {

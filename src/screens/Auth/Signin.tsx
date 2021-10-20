@@ -1,34 +1,29 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { View, TextInput, StyleSheet, Text, Alert } from "react-native";
-import Layout from "../components/common/Layout";
-import Button from "../components/ui/Button";
-import { connect, RootStateOrAny } from "react-redux";
+import React, { useCallback, useState } from "react";
+import { View, StyleSheet, Alert } from "react-native";
+import Layout from "components/common/Layout";
+import Button from "components/ui/Button";
 import { useFocusEffect, useNavigation } from "@react-navigation/core";
-import { colors } from "../styles/variables";
-import * as userActions from "../redux/actions/userActions";
-import { Input } from "../components/ui";
-import { Logo } from "../components/common";
+import { colors } from "style/variables";
+import { Input } from "components/ui";
+import { Logo } from "components/common";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useAppDispatch, useAppSelector } from "store/store";
+import { signinUser } from "store/slices/userSlice";
 
-interface Props {
-  loading: boolean;
-  data: any;
-  error: any;
-  userLogIn: typeof userActions.logIn;
-  userErrorClear: typeof userActions.errorClear;
-}
+interface Props {}
 
-const Login: React.FC<Props> = (props) => {
-  const { loading, data, error, userLogIn, userErrorClear } = props;
+const Signin: React.FC<Props> = (props) => {
+  const { user, loading, error } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const nav = useNavigation();
   useFocusEffect(
     useCallback(() => {
-      if (error) {
+      if (error && error.message) {
         Alert.alert(error.message);
-        userErrorClear();
+        // Clear Error
       }
     }, [error])
   );
@@ -49,7 +44,10 @@ const Login: React.FC<Props> = (props) => {
             placeholder="PASSWORD"
             secureTextEntry
           />
-          <Button disabled={loading} onPress={() => userLogIn(email, password)}>
+          <Button
+            disabled={loading}
+            onPress={() => dispatch(signinUser({ email, password }))}
+          >
             {loading ? "Loading..." : "Log In"}
           </Button>
           <Button onPress={() => nav.navigate("Register")} color={colors.error}>
@@ -61,18 +59,7 @@ const Login: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootStateOrAny) => ({
-  loading: state.user.loading,
-  data: state.user.data,
-  error: state.user.error,
-});
-
-const mapDispatch = {
-  userLogIn: userActions.logIn as any,
-  userErrorClear: userActions.errorClear as any,
-};
-
-export default connect(mapState, mapDispatch)(Login);
+export default Signin;
 
 const styles = StyleSheet.create({
   container: {

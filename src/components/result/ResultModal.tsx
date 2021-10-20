@@ -1,22 +1,20 @@
 import { useNavigation } from "@react-navigation/core";
 import React, { Dispatch } from "react";
-import { Modal, Pressable, StyleSheet, View, Text } from "react-native";
-import { RootState } from "../../redux/store";
-import { colors } from "../../styles/variables";
+import { Modal, StyleSheet, View, Text } from "react-native";
+import { colors } from "style/variables";
 import { Ionicons } from "@expo/vector-icons";
-import { Button } from "../ui";
-import { connect } from "react-redux";
-import { color } from "react-native-reanimated";
+import { Button } from "components/ui";
+import { useAppSelector } from "store/store";
 
 interface Props {
   show: boolean;
   setShow: Dispatch<boolean>;
-  result: "win" | "loss";
-  category: string;
 }
 
 const ResultModal: React.FC<Props> = (props) => {
-  const { show, setShow, result, category } = props;
+  const { show, setShow } = props;
+  const { result } = useAppSelector((state) => state.result);
+  const { category } = useAppSelector((state) => state.categories);
 
   const nav = useNavigation();
 
@@ -129,9 +127,4 @@ const ResultModal: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  result: state.result.data!,
-  category: state.game.category!,
-});
-
-export default connect(mapState)(ResultModal);
+export default ResultModal;

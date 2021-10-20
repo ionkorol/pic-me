@@ -1,34 +1,19 @@
-import { useNavigation } from "@react-navigation/core";
 import { createStackNavigator } from "@react-navigation/stack";
-import React, { useEffect } from "react";
-import { connect } from "react-redux";
-import { RootState } from "../redux/store";
+import React from "react";
 
-import Login from "../screens/Login";
-import Register from "../screens/Register";
-import { UserProp } from "../utils/interfaces";
+import { Signin, Signup } from "screens/Auth/";
 
 const Stack = createStackNavigator();
 
-interface Props {
-  userData: UserProp;
-  userLoading: boolean
-}
+interface Props {}
 
 const AuthNavigation: React.FC<Props> = (props) => {
-  const { userData } = props;
-
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="Signin" component={Signin} />
+      <Stack.Screen name="Signup" component={Signup} />
     </Stack.Navigator>
   );
 };
 
-const mapState = (state: RootState) => ({
-  userData: state.user.data,
-  userLoading: state.user.loading
-});
-
-export default connect(mapState)(AuthNavigation);
+export default AuthNavigation;

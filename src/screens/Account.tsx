@@ -1,41 +1,25 @@
 import React, { useState } from "react";
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  Switch,
-  TextInputProps,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import Layout from "../components/common/Layout";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/core";
-import { connect } from "react-redux";
-import { RootState } from "../redux/store";
-import { UserProp } from "../utils/interfaces";
-import { Button, Input, SexSelect } from "../components/ui";
-import * as userActions from "../redux/actions/userActions";
-import { colors } from "../styles/variables";
-import { Header } from "../components/common";
-import { classes } from "../styles";
-import { getAvatarUrl } from "../lib";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { View, Text } from "react-native";
+import Layout from "components/common/Layout";
 
-interface Props {
-  data: UserProp;
-  userLogOut: () => void;
-  userSave: typeof userActions.save;
-}
+import { useAppDispatch, useAppSelector } from "store/store";
+import { Button, Input, SexSelect } from "components/ui";
+import { colors } from "style/variables";
+import { Header } from "components/common";
+import { classes } from "style";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { signoutUser } from "store/slices/userSlice";
+
+interface Props {}
 
 const Account: React.FC<Props> = (props) => {
-  const { data, userLogOut, userSave } = props;
+  const userData = useAppSelector((state) => state.user.user!);
+  const dispatch = useAppDispatch();
 
-  const [name, setName] = useState(data.name);
+  const [name, setName] = useState(userData.name);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [sex, setSex] = useState<"male" | "female">(data.sex);
+  const [sex, setSex] = useState<"male" | "female">(userData.sex);
 
   return (
     <Layout>
@@ -74,10 +58,13 @@ const Account: React.FC<Props> = (props) => {
           placeholder="NEW PASSWORD"
           secureTextEntry
         />
-        <Button color={colors.success} onPress={() => userSave(name, sex)}>
+        <Button
+          color={colors.success}
+          onPress={() => console.log("Update User")}
+        >
           Save
         </Button>
-        <Button color={colors.error} onPress={userLogOut}>
+        <Button color={colors.error} onPress={() => dispatch(signoutUser())}>
           Log Out
         </Button>
       </KeyboardAwareScrollView>
@@ -85,15 +72,4 @@ const Account: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  data: state.user.data!,
-});
-
-const mapDispatch = {
-  userLogOut: userActions.logOut,
-  userSave: userActions.save as any,
-};
-
-export default connect(mapState, mapDispatch)(Account);
-
-const styles = StyleSheet.create({});
+export default Account;

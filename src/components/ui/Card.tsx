@@ -2,21 +2,22 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
-import { CategorieProp } from "../../utils/interfaces";
-import * as gameActions from "../../redux/actions/gameActions";
 import { connect } from "react-redux";
+import { CategoryProp } from "utils/interfaces";
+import { useAppDispatch, useAppSelector } from "store/store";
+import { setCategory } from "store/slices/categoriesSlice";
 
 interface Props {
-  data: CategorieProp;
-  gameSetCategory: (category: string) => any;
+  data: CategoryProp;
 }
 
 const Card: React.FC<Props> = (props) => {
-  const { data, gameSetCategory } = props;
+  const { data } = props;
   const nav = useNavigation();
+  const dispatch = useAppDispatch();
 
   const handlePress = () => {
-    gameSetCategory(data.name);
+    dispatch(setCategory(data.name));
     nav.navigate("Camera");
   };
 
@@ -54,11 +55,7 @@ const Card: React.FC<Props> = (props) => {
   );
 };
 
-const mapDispatch = {
-  gameSetCategory: gameActions.setCategory,
-};
-
-export default connect(null, mapDispatch)(Card);
+export default Card;
 
 const styles = StyleSheet.create({
   container: {

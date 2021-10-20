@@ -1,37 +1,35 @@
 import React from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
-import { Avatar } from "../account";
+import { Avatar } from "components/account";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { colors } from "../../styles/variables";
+import { colors } from "style/variables";
 import { useNavigation, useRoute } from "@react-navigation/core";
-import { RootState } from "../../redux/store";
-import { connect } from "react-redux";
-import { UserProp } from "src/utils/interfaces";
-import { classes } from "../../styles/";
 
-interface Props {
-  data: UserProp;
-}
+import { classes } from "style";
+import { useAppSelector } from "store/store";
+import { HStack } from "native-base";
+
+interface Props {}
 
 const Header: React.FC<Props> = (props) => {
-  const { data } = props;
+  const { user } = useAppSelector((state) => state.user);
 
   const nav = useNavigation();
   const route = useRoute();
 
   return (
-    <View style={styles.header}>
+    <HStack>
       <Pressable
         style={styles.profileContainer}
         onPress={() => nav.navigate("Account")}
       >
         <Avatar />
         <View style={styles.profileInfo}>
-          <Text style={classes.h1}>{data.name}</Text>
+          <Text style={classes.h1}>{user?.name}</Text>
           <View style={{ flexDirection: "row" }}>
             <Ionicons name="star" size={20} color={colors.gray} />
             <Text style={{ ...classes.text, ...classes.bold, ...classes.ml }}>
-              {data.totalPoints}
+              {user?.totalPoints}
             </Text>
           </View>
         </View>
@@ -51,15 +49,11 @@ const Header: React.FC<Props> = (props) => {
           onPress={() => nav.navigate("Home")}
         />
       )}
-    </View>
+    </HStack>
   );
 };
 
-const mapState = (state: RootState) => ({
-  data: state.user.data!,
-});
-
-export default connect(mapState)(Header);
+export default Header;
 
 const styles = StyleSheet.create({
   header: {

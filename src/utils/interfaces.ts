@@ -15,6 +15,10 @@ export interface UserProp {
   };
 }
 
+export interface UserWithCredentialsProp extends UserProp {
+  password: string;
+}
+
 export interface CategoryProp {
   name: string;
   color: string;

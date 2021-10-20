@@ -1,26 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, TextInput, Text, Alert } from "react-native";
-import Layout from "../components/common/Layout";
-import { Button, Input, SexSelect } from "../components/ui";
+import Layout from "components/common/Layout";
+import { Button, Input, SexSelect } from "components/ui";
 import { useFocusEffect, useNavigation } from "@react-navigation/core";
 import { connect } from "react-redux";
-import { UserProp } from "../utils/interfaces";
-import { RootState } from "../redux/store";
-import * as userActions from "../redux/actions/userActions";
-import { Logo } from "../components/common";
-import { colors } from "../styles/variables";
+import { UserProp } from "utils/interfaces";
+import { RootState, useAppDispatch, useAppSelector } from "store/store";
+import { Logo } from "components/common";
+import { colors } from "style/variables";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { signupUser } from "store/slices/userSlice";
 
-interface Props {
-  loading: boolean;
-  data: UserProp;
-  error: any;
-  userRegister: typeof userActions.register;
-  userErrorClear: typeof userActions.errorClear;
-}
+interface Props {}
 
-const Register: React.FC<Props> = (props) => {
-  const { loading, error, userRegister, userErrorClear } = props;
+const Signup: React.FC<Props> = (props) => {
+  const { user, loading, error } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
   const [name, setName] = useState("");
   const [sex, setSex] = useState<"male" | "female">("male");
@@ -30,9 +25,9 @@ const Register: React.FC<Props> = (props) => {
 
   useFocusEffect(
     useCallback(() => {
-      if (error) {
+      if (error && error.message) {
         Alert.alert(error.message);
-        userErrorClear();
+        // Clear Error
       }
     }, [error])
   );
@@ -57,7 +52,7 @@ const Register: React.FC<Props> = (props) => {
           />
           <Button
             disabled={loading}
-            onPress={() => userRegister(email, password, name, sex)}
+            onPress={() => dispatch(signupUser({ name, sex, email, password }))}
           >
             {loading ? "Registering..." : "Register"}
           </Button>
@@ -70,18 +65,7 @@ const Register: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  loading: state.user.loading,
-  data: state.user.data!,
-  error: state.user.error,
-});
-
-const mapDispatch = {
-  userRegister: userActions.register as any,
-  userErrorClear: userActions.errorClear as any,
-};
-
-export default connect(mapState, mapDispatch)(Register);
+export default Signup;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,70 +1,38 @@
-import { useFocusEffect, useNavigation } from "@react-navigation/core";
-import React, { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/core";
+import React, { useCallback, useState } from "react";
 import {
   View,
   ImageBackground,
   ActivityIndicator,
   StyleSheet,
-  Text,
 } from "react-native";
-import { Button } from "../components/ui";
-import { RootState } from "../redux/store";
+import { RootState, useAppDispatch, useAppSelector } from "store/store";
 import { connect } from "react-redux";
-import { UserProp } from "../utils/interfaces";
+import { UserProp } from "utils/interfaces";
 
-import * as gameActions from "../redux/actions/gameActions";
-import * as pictureActions from "../redux/actions/pictureActions";
-import * as resultActions from "../redux/actions/resultActions";
-import { ResultModal } from "../components/result";
+import { ResultModal } from "components/result";
+import { getLabels } from "store/slices/labelsSlice";
+import { rewardUser, setResult } from "store/slices/resultSlice";
+import { setImage } from "store/slices/gameSlice";
 
-interface Props {
-  category: string;
-
-  userData: UserProp;
-
-  picture: string;
-
-  labelsLoading: boolean;
-  labelsData: string[] | null;
-  labelsError: string | null;
-
-  result: "win" | "loss" | null;
-
-  gameRewardPoint: typeof gameActions.rewardPoint;
-  pictureClear: typeof pictureActions.clear;
-  pictureGetLabels: typeof pictureActions.getLabels;
-  pictureClearLabels: typeof pictureActions.clearLabels;
-
-  resultSet: typeof resultActions.set;
-  resultClear: typeof resultActions.clear;
-}
+interface Props {}
 
 const Result: React.FC<Props> = (props) => {
-  const {
-    category,
-    picture,
-    userData,
-    labelsData,
-    labelsLoading,
-    labelsError,
-    gameRewardPoint,
-    pictureClear,
-    pictureGetLabels,
-    pictureClearLabels,
-    resultSet,
-    resultClear,
-    result,
-  } = props;
+  const { category } = useAppSelector((state) => state.categories);
+  const { image } = useAppSelector((state) => state.game);
+  const labelsData = useAppSelector((state) => state.labels.labels);
+  const result = useAppSelector((state) => state.result.result!);
+  const dispatch = useAppDispatch();
 
   const [showModal, setShowModal] = useState(false);
 
   // Get Picture Labels
   useFocusEffect(
     useCallback(() => {
-      if (picture) {
-        pictureGetLabels(picture);
+      if (image) {
+        dispatch(getLabels(image));
       }
-    }, [picture])
+    }, [image])
   );
 
   // Check if the label is found
@@ -73,10 +41,10 @@ const Result: React.FC<Props> = (props) => {
       if (labelsData === null) {
         return;
       }
-      if (labelsData.includes(category)) {
-        resultSet("win");
+      if (labelsData.includes(category!)) {
+        dispatch(setResult("win"));
       } else {
-        resultSet("loss");
+        dispatch(setResult("loss"));
       }
       setShowModal(true);
     }, [labelsData])
@@ -86,7 +54,7 @@ const Result: React.FC<Props> = (props) => {
   useFocusEffect(
     useCallback(() => {
       if (result === "win") {
-        gameRewardPoint();
+        dispatch(rewardUser(category!));
       }
     }, [result])
   );
@@ -95,16 +63,14 @@ const Result: React.FC<Props> = (props) => {
   useFocusEffect(
     useCallback(() => {
       return () => {
-        pictureClearLabels();
-        pictureClear();
-        resultClear();
+        dispatch(setImage(null));
       };
     }, [])
   );
 
   return (
     <View style={styles.container}>
-      <ImageBackground style={styles.image} source={{ uri: picture }}>
+      <ImageBackground style={styles.image} source={{ uri: image! }}>
         <View>
           {result ? (
             <ResultModal show={showModal} setShow={setShowModal} />
@@ -117,26 +83,7 @@ const Result: React.FC<Props> = (props) => {
   );
 };
 
-const mapState = (state: RootState) => ({
-  userData: state.user.data!,
-  picture: state.picture.image!,
-  category: state.game.category!,
-  labelsLoading: state.picture.labelsLoading,
-  labelsData: state.picture.labelsData,
-  labelsError: state.picture.labelsError,
-  result: state.result.data,
-});
-
-const mapDispatch = {
-  gameRewardPoint: gameActions.rewardPoint as any,
-  pictureClear: pictureActions.clear as any,
-  pictureGetLabels: pictureActions.getLabels as any,
-  pictureClearLabels: pictureActions.clearLabels as any,
-  resultSet: resultActions.set as any,
-  resultClear: resultActions.clear as any,
-};
-
-export default connect(mapState, mapDispatch)(Result);
+export default Result;
 
 const styles = StyleSheet.create({
   container: {
